@@ -7,6 +7,14 @@ Dépôt pour le projet "Cartes à puces" réalisé à l'Université de Cergy-Pon
 
 # Groupe
 
+* Alexis Aktor
+* Alexandre Fourgs
+* Vincent Monot
+* Antoine Regnier
+* ?
+* ?
+* ?
+
 # Installation
 
 Sous Linux (base Debian), il est nécessaire d'avoir certains paquets et drivers installés pour pouvoir utiliser les lecteurs de cartes.
