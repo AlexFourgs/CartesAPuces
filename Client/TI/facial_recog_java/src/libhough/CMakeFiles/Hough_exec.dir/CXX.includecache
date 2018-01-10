@@ -1,0 +1,22 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/antoine/git/CartesAPuces/Client/TI/facial_reco_c/facial_recog_hough.cpp
+facial_recog_hough.h
+/home/antoine/git/CartesAPuces/Client/TI/facial_reco_c/facial_recog_hough.h
+
+/home/antoine/git/CartesAPuces/Client/TI/facial_reco_c/facial_recog_hough.h
+opencv2/opencv.hpp
+-
+cmath
+-
+
+/home/antoine/git/CartesAPuces/Client/TI/facial_reco_c/main.cpp
+facial_recog_hough.h
+/home/antoine/git/CartesAPuces/Client/TI/facial_reco_c/facial_recog_hough.h
+
