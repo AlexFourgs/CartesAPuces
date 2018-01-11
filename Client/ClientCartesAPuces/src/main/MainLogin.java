@@ -22,63 +22,46 @@ import javax.smartcardio.TerminalFactory;
 import smartcard.SmartCard;
 import smartcard.Word;
 
-public class Main {
-
-	public static byte[] stringToMD5Bytes(String msg) throws NoSuchAlgorithmException {
-		MessageDigest md = MessageDigest.getInstance("MD5");
-		md.update(msg.getBytes());
-
-		return md.digest();
-	}
-
-	public static String stringToMD5String(String msg) throws NoSuchAlgorithmException {
-		StringBuilder sb = new StringBuilder();
-		for (byte b : stringToMD5Bytes(msg)) {
-			sb.append(String.format("%02X", b));
-		}
-
-		return sb.toString();
-	}
+public class MainLogin {
 
 	public static void main(String[] args) {
 		String urlString = "http://localhost/carteapuces.php";
+		Scanner scan = new Scanner(System.in);
 
-//		try {
+		try {
 			// Recherche des terminaux
-//			List<CardTerminal> terminauxDispos = TerminalFactory.getDefault().terminals().list();
-//			SmartCard sc = new SmartCard(terminauxDispos.get(0));
-//			// Attendre qu'il y a une carte qui se connecte
-//			sc.getTerminal().waitForCardPresent(0);
-//			sc.connect();
-//
-//			// Check le code PIN
-			Scanner scan = new Scanner(System.in);
-//			System.out.println("entrez le code PIN :");
-//			String str = scan.nextLine();
-//
-//			byte[] pin0 = SmartCard.hexStringToByteArray(str);
-//			System.out.println(SmartCard.toString(pin0));
-//
-//			ResponseAPDU r = sc.testPin((byte) 0x07, new Word(pin0));
-//			if (r.getSW1() == (byte) 0x63) {
-//				System.err.println("Mauvais code PIN");
-//				r = sc.testPin((byte) 0x07, new Word((byte) 0xAA, (byte) 0xAA, (byte) 0xAA, (byte) 0xAA));
-//				System.out.println(String.format("%02X %02X", r.getSW1(), r.getSW2()));
-//				System.exit(1);
-//			}
-//			System.out.println(String.format("%02X %02X", r.getSW1(), r.getSW2()));
-//
-//			// Récpérer l'id
-//			ArrayList<ResponseAPDU> responses = sc.readCard((byte) 0x10, 4);
-//			String id = "";
-//			for (ResponseAPDU resp : responses) {
-//				byte[] b = resp.getData();
-//				id += String.format("%02X%02X%02X%02X", b[0], b[1], b[2], b[3]);
-//			}
-//			System.out.println(id);
-//
-//			// Check la bdd avec l'id
-//			// L'utilisateur choisis entre login et mdp ou biométrie
+			List<CardTerminal> terminauxDispos = TerminalFactory.getDefault().terminals().list();
+			SmartCard sc = new SmartCard(terminauxDispos.get(0));
+			// Attendre qu'il y a une carte qui se connecte
+			sc.getTerminal().waitForCardPresent(0);
+			sc.connect();
+
+			// Check le code PIN
+			System.out.println("entrez le code PIN :");
+			String str = scan.nextLine();
+
+			byte[] pin0 = Functions.hexStringToByteArray(str);
+			System.out.println(Functions.toString(pin0));
+
+			ResponseAPDU r = sc.testPin((byte) 0x07, new Word(pin0));
+			if (r.getSW1() == (byte) 0x63) {
+				System.err.println("Mauvais code PIN");
+				r = sc.testPin((byte) 0x07, new Word((byte) 0xAA, (byte) 0xAA, (byte) 0xAA, (byte) 0xAA));
+				System.out.println(String.format("%02X %02X", r.getSW1(), r.getSW2()));
+				System.exit(1);
+			}
+			System.out.println(String.format("%02X %02X", r.getSW1(), r.getSW2()));
+
+			// Récpérer l'id
+			ArrayList<ResponseAPDU> responses = sc.readCard((byte) 0x10, 4);
+			String id = "";
+			for (ResponseAPDU resp : responses) {
+				byte[] b = resp.getData();
+				id += String.format("%02X%02X%02X%02X", b[0], b[1], b[2], b[3]);
+			}
+			System.out.println(id);
+
+			// L'utilisateur choisis entre login et mdp ou biométrie
 
 			int choice = 0;
 			String choiceStr = "";
@@ -98,7 +81,7 @@ public class Main {
 				String mdp = scan.nextLine();
 
 				try {
-					String mdpMD5 = stringToMD5String(mdp);
+					String mdpMD5 = Functions.stringToMD5String(mdp);
 
 					URL url = new URL(urlString);
 					StringBuilder result = new StringBuilder();
@@ -106,7 +89,7 @@ public class Main {
 					HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
 					if (conn != null) {
-						String urlParameters = "login=" + login + "&mdp=" + mdpMD5;
+						String urlParameters = "action=login&login=" + login + "&mdp=" + mdpMD5;
 						byte[] postData = urlParameters.getBytes(StandardCharsets.UTF_8);
 						int postDataLength = postData.length;
 
@@ -145,9 +128,11 @@ public class Main {
 			case 2:
 				break;
 			}
-//		} catch (CardException e) {
-//			e.printStackTrace();
-//		}
+			
+		} catch (CardException e) {
+			e.printStackTrace();
+		}
+		scan.close();
 
 		// Connection au serveur et check
 		//
