@@ -8,9 +8,9 @@ public class User {
 	private String login;
 	private String empreintePassword;
 
-	public User(String id, String nom, String prenom, String mail, String login) {
+	public User(String nom, String prenom, String mail, String login) {
 		super();
-		this.id = id;
+	
 		this.nom = nom;
 		this.prenom = prenom;
 		this.mail = mail;
