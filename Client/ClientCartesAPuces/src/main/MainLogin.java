@@ -7,7 +7,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
@@ -89,7 +88,7 @@ public class MainLogin {
 					HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
 					if (conn != null) {
-						String urlParameters = "action=login&login=" + login + "&mdp=" + mdpMD5;
+						String urlParameters = "action=login&login=" + login + "&password=" + mdpMD5;
 						byte[] postData = urlParameters.getBytes(StandardCharsets.UTF_8);
 						int postDataLength = postData.length;
 
