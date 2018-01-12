@@ -2,23 +2,45 @@ package com.atelierBio.bean;
 
 public class User {
 	private String id;
-	private String nom;
-	private String prenom;
+	private String lastName;
+	private String firstName;
 	private String mail;
 	private String login;
-	private String empreintePassword;
+	private String password;
+	private String histoR;
+	private String histoG;
+	private String histoB;
 
-	public User(String nom, String prenom, String mail, String login) {
+	public User(String lastName, String firstName, String mail, String login, String password, String histoR, String histoG, String histoB) {
 		super();
 	
-		this.nom = nom;
-		this.prenom = prenom;
+		this.lastName = lastName;
+		this.firstName = firstName;
 		this.mail = mail;
 		this.login = login;
+		this.password = password;
+		this.histoR = histoR;
+		this.histoG = histoG;
+		this.histoB = histoB;
 	}
 
 	public User() {
 		// TODO Auto-generated constructor stub
+	}
+
+	public User(String id, String lastName, String firstName, String mail, String login, String password,
+			String histoR, String histoG, String histoB) {
+		super();
+		
+		this.id = id;
+		this.lastName = lastName;
+		this.firstName = firstName;
+		this.mail = mail;
+		this.login = login;
+		this.password = password;
+		this.histoR = histoR;
+		this.histoG = histoG;
+		this.histoB = histoB;
 	}
 
 	public String getId() {
@@ -29,20 +51,20 @@ public class User {
 		this.id = id;
 	}
 
-	public String getNom() {
-		return nom;
+	public String getLastName() {
+		return lastName;
 	}
 
-	public void setNom(String nom) {
-		this.nom = nom;
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
 	}
 
-	public String getPrenom() {
-		return prenom;
+	public String getFirstName() {
+		return firstName;
 	}
 
-	public void setPrenom(String prenom) {
-		this.prenom = prenom;
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
 	}
 
 	public String getMail() {
@@ -61,12 +83,36 @@ public class User {
 		this.login = login;
 	}
 
-	public String getEmpreintePassword() {
-		return empreintePassword;
+	public String getPassword() {
+		return password;
 	}
 
-	public void setEmpreintePassword(String empreintePassword) {
-		this.empreintePassword = empreintePassword;
+	public void setPassword(String password) {
+		this.password = password;
+	}
+	
+
+	public String getHistoR() {
+		return histoR;
 	}
 
+	public void setHistoR(String histoR) {
+		this.histoR = histoR;
+	}
+
+	public String getHistoG() {
+		return histoG;
+	}
+
+	public void setHistoG(String histoG) {
+		this.histoG = histoG;
+	}
+
+	public String getHistoB() {
+		return histoB;
+	}
+
+	public void setHistoB(String histoB) {
+		this.histoB = histoB;
+	}
 }

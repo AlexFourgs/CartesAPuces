@@ -21,7 +21,7 @@ public class Connexion {
 	/**
 	 * Mot de passe du user
 	 */
-	private static String passwd = "azerty";
+	private static String passwd = "root";
 
 	/**
 	 * Objet Connection
@@ -29,7 +29,7 @@ public class Connexion {
 	private static Connection connect;
 
 	/**
-	 * Méthode qui va retourner notre instance et la créer si elle n'existe
+	 * Mï¿½thode qui va retourner notre instance et la crï¿½er si elle n'existe
 	 * pas...
 	 * 
 	 * @return
@@ -39,13 +39,13 @@ public class Connexion {
 			try {
 				Class.forName("org.postgresql.Driver");
 			} catch (ClassNotFoundException e) {
-					System.out.println("classe non trouvée");
+					System.out.println("classe non trouvï¿½e");
 			}
 
 			try {
 
 				connect = DriverManager.getConnection(url, user, passwd);
-				System.out.println("coucou ");
+				System.out.println("Connexion ok ");
 			} catch (SQLException e) {
 				System.out.println("RAD_ATELIERBIO: " + e.getMessage());
 				JOptionPane.showMessageDialog(null, e.getMessage(),

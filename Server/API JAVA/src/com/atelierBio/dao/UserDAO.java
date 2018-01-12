@@ -16,36 +16,33 @@ public class UserDAO extends DAO<User> {
 
 	@Override
 	public boolean create(User obj) throws Exception {
-		String rqtInsert = "INSERT INTO public.ab_user"
-				+ "VALUES (newUserID(), ?, ?, ?, ?, ?);";
+		String rqtInsert = "insert into public.ab_user values (newUserID(), ?, ?, ?, ?, ?, ?, ?, ?);";
 
-		/* Implémentation de la méthode définie dans l'interface UtilisateurDao */
+		/* ImplÃ©mentation de la mÃ©thode dÃ©finie dans l'interface UtilisateurDao */
 		Connection connexion = null;
 		PreparedStatement preparedStatement = null;
 		ResultSet valeursAutoGenerees = null;
 		try {
-			/* Récupération d'une connexion depuis la Factory */
+			/* RÃ©cupÃ©ration d'une connexion depuis la Factory */
 			connexion = this.connect;
-			preparedStatement = initialisationRequetePreparee(connexion,
-					rqtInsert, true, obj.getNom(), obj.getPrenom(),
-					obj.getLogin(), obj.getEmpreintePassword());
+			preparedStatement = initialisationRequetePreparee(connexion,rqtInsert, true, obj.getLastName(), obj.getFirstName(), obj.getMail(), obj.getLogin(), obj.getPassword(), obj.getHistoR(), obj.getHistoG(), obj.getHistoB());
 			int statut = preparedStatement.executeUpdate();
-			/* Analyse du statut retourné par la requête d'insertion */
+			/* Analyse du statut retournÃ© par la requÃªte d'insertion */
 			if (statut == 0) {
 				throw new Exception(
-						"Échec de la création de l'utilisateur, aucune ligne ajoutée dans la table.");
+						"Echec de crÃ©ation de l'utilisateur, aucune ligne ajoutï¿½e dans la table.");
 			}
-			/* Récupération de l'id auto-généré par la requête d'insertion */
+			/* RÃ©cupÃ©ration de l'id auto-gÃ©nÃ©rÃ© par la requÃªte d'insertion */
 			valeursAutoGenerees = preparedStatement.getGeneratedKeys();
 			if (valeursAutoGenerees.next()) {
 				/*
-				 * Puis initialisation de la propriété id du bean Utilisateur
+				 * Puis initialisation de la propriÃ©tÃ© id du bean Utilisateur
 				 * avec sa valeur
 				 */
 				obj.setId(valeursAutoGenerees.getString(1));
 			} else {
 				throw new Exception(
-						"Échec de la création de l'utilisateur en base, aucun ID auto-généré retourné.");
+						"Echec de crÃ©ation de l'utilisateur en base, aucun ID auto-gÃ©nÃ©rÃ© retournÃ©.");
 			}
 		} catch (SQLException e) {
 			throw new Exception(e);
@@ -75,11 +72,28 @@ public class UserDAO extends DAO<User> {
 					ResultSet.CONCUR_READ_ONLY).executeQuery(
 					"SELECT * FROM ab_user WHERE iduser = '" + id + "'");
 			if (result.first())
-				Unuser = new User(result.getString("nomuser"),
-						result.getString("prenomuser"),
-						result.getString("mailuser"),
-						result.getString("loginuser"));
+				Unuser = new User(result.getString("lastName"), result.getString("firstName"), result.getString("mail"), result.getString("login"), result.getString("password"),  result.getString("histoR"), result.getString("histoG"), result.getString("histoB"));
 			Unuser.setId(id);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return Unuser;
+	}
+	@Override
+	public User find(String login, String password) {
+		User Unuser = new User();
+
+		try {
+			ResultSet result = this.connect.createStatement(
+					ResultSet.TYPE_SCROLL_INSENSITIVE,
+					ResultSet.CONCUR_READ_ONLY).executeQuery(
+					"SELECT * FROM ab_user WHERE login = '" + login + "' and password = '" + password + "'");
+			if (result.first()) {
+				Unuser = new User (result.getString("iduser"), result.getString("lastName"), result.getString("firstName"), result.getString("mail"), result.getString("login"), result.getString("password"),  result.getString("histoR"), result.getString("histoG"), result.getString("histoB"));
+			}
+			else {
+				Unuser = null;
+			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -93,8 +107,8 @@ public class UserDAO extends DAO<User> {
 	}
 
 	/*
-	 * Initialise la requête préparée basée sur la connexion passée en argument,
-	 * avec la requête SQL et les objets donnés.
+	 * Initialise la requÃªte prÃ©parÃ©e basÃ©e sur la connexion passÃ©e en argument,
+	 * avec la requÃªte SQL et les objets donnÃ©s.
 	 */
 	public static PreparedStatement initialisationRequetePreparee(
 			Connection connexion, String sql, boolean returnGeneratedKeys,
