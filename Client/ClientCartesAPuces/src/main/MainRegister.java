@@ -3,7 +3,6 @@ package main;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
@@ -25,9 +24,6 @@ public class MainRegister {
 
 	public static void main(String[] args) {
 		String urlString = "https://192.168.1.3:8443/AtelierBiometrie/AtelierBio";
-//		String urlString = "http://192.168.1.3:8080/AtelierBiometrie/AtelierBio";
-//		String urlString = "http://localhost/carteapuces.php";
-//		String urlString = "https://vmonot.fr/carteapuces.php";
 		Scanner scan = new Scanner(System.in);
 		Runtime runtime = Runtime.getRuntime();
 		Process p;
@@ -47,7 +43,7 @@ public class MainRegister {
 		String lastname = scan.nextLine();
 		
 		// Demander prenom
-		System.out.println("entrer votre prénom :");
+		System.out.println("entrer votre prï¿½nom :");
 		String firstname = scan.nextLine();
 		
 		// Demander mail
@@ -55,7 +51,7 @@ public class MainRegister {
 		String mail = scan.nextLine();
 		
 		try {
-//			// Récupérer biométrie
+			// RÃ©cupÃ©rer biomÃ©trie
 //			p = runtime.exec("./iris.out");
 //			is = new BufferedReader(new InputStreamReader(p.getInputStream()));
 //			
@@ -91,14 +87,14 @@ public class MainRegister {
 //			}
 //			p.waitFor();
 			
-			// Requête Serveur
+			// RequÃªte Serveur
 			Functions.trustSSL();
 
 			String mdpSHA256 = Functions.stringToSHA256String(mdp);
 			
-			String histoRStr = "zez";
-			String histoGStr = "zeze";
-			String histoBStr = "zezez";
+			String histoRStr = "";
+			String histoGStr = "";
+			String histoBStr = "";
 //			for(int i=0 ; i<256 ; i++) {
 //				histoRStr += ","+histoR[i]; 
 //			}
@@ -111,7 +107,7 @@ public class MainRegister {
 //			histoRStr = histoRStr.substring(1);
 //			histoGStr = histoGStr.substring(1);
 //			histoBStr = histoBStr.substring(1);
-			
+//			
 			String urlParameters = "action=register&login=" + login + "&password=" + mdpSHA256 + "&lastName=" + lastname + "&firstName=" + firstname + "&mail=" + mail
 					+ "&histoR=" + histoRStr + "&histoG=" + histoGStr + "&histoB=" + histoBStr ;
 
@@ -132,12 +128,14 @@ public class MainRegister {
 				}
 				System.out.println(result.toString());
 
-				// Récupérer id
+				// RÃ©cupÃ©rer id
 				JSONObject json = new JSONObject(result.toString());
 				
 				String registerResult = json.getString("result");
 				if(registerResult != null && registerResult.equals("ok")) {
-					String id = json.getString("newUserID");// Ecrire dans la carte
+					String id = json.getString("newUserID");
+					
+					// Ecrire dans la carte
 					List<CardTerminal> terminauxDispos = TerminalFactory.getDefault().terminals().list();
 					SmartCard sc = new SmartCard(terminauxDispos.get(0));
 					// Attendre qu'il y ait une carte qui se connecte

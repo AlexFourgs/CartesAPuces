@@ -1,12 +1,9 @@
 package main;
 
 import java.io.BufferedReader;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +25,10 @@ public class MainLogin {
 	public static void main(String[] args) {
 		String urlString = "https://192.168.1.3:8443/AtelierBiometrie/AtelierBio";
 		Scanner scan = new Scanner(System.in);
+		Runtime runtime = Runtime.getRuntime();
+		Process p;
+		BufferedReader is;
+		String line;
 
 		try {
 			// Recherche des terminaux
@@ -53,7 +54,7 @@ public class MainLogin {
 			}
 			System.out.println(String.format("%02X %02X", r.getSW1(), r.getSW2()));
 
-			// RÈcupÈrer l'id
+			// R√©cup√©rer l'id
 			ArrayList<ResponseAPDU> responses = sc.readCard((byte) 0x10, 8);
 			String id = "";
 			for (ResponseAPDU resp : responses) {
@@ -62,13 +63,13 @@ public class MainLogin {
 			}
 			System.out.println(id);
 
-			// L'utilisateur choisis entre login et mdp ou biomÈtrie
+			// L'utilisateur choisis entre login et mdp ou biom√©trie
 
 			int choice = 0;
 			String choiceStr = "";
 			
 			do {
-				System.out.println("entrer votre choix : \n  1 pour login/mdp\n  2 pour biomÈtrie\n");
+				System.out.println("entrer votre choix : \n  1 pour login/mdp\n  2 pour biom√©trie\n");
 				choiceStr = scan.nextLine();
 			} while (!choiceStr.equals("1") && !choiceStr.equals("2"));
 
@@ -84,7 +85,7 @@ public class MainLogin {
 				try {
 					String mdpSHA256 = Functions.stringToSHA256String(mdp);
 
-					String urlParameters = "action=login&login=" + login + "&password=" + mdpSHA256 + "&id=" + id;
+					String urlParameters = "action=login&mode=password&login=" + login + "&password=" + mdpSHA256 + "&id=" + id;
 					URL url = new URL(urlString + "?" + urlParameters);
 					StringBuilder result = new StringBuilder();
 					Functions.trustSSL();
@@ -96,7 +97,6 @@ public class MainLogin {
 							BufferedReader br = new BufferedReader(
 									new InputStreamReader(conn.getInputStream(), "UTF-8"));
 
-							String line;
 							while ((line = br.readLine()) != null) {
 								result.append(line + "\n");
 							}
@@ -120,6 +120,122 @@ public class MainLogin {
 				break;
 
 			case 2:
+				try {
+					// R√©cup√©rer biom√©trie
+//					p = runtime.exec("./iris.out");
+//					is = new BufferedReader(new InputStreamReader(p.getInputStream()));
+//					
+//					ArrayList<int[][]> histoList = new ArrayList<int[][]>();
+//					int[][] histos = new int[3][];
+//					int[] histoR = new int[256];
+//					int[] histoG = new int[256];
+//					int[] histoB = new int[256];
+//					
+//					while((line = is.readLine()) != null) {
+//						System.out.println(line);
+//						String[] values = line.split(",");
+//						if(values.length == 257) {
+//							switch(values[0]) {
+//							case "R":
+//								for(int i=0 ; i<256 ; i++) {
+//									histoR[i] = Integer.valueOf(values[i+1]);
+//								}
+//								histos[0] = histoR;
+//								break;
+//							case "G":
+//								for(int i=0 ; i<256 ; i++) {
+//									histoG[i] = Integer.valueOf(values[i+1]);
+//								}
+//								histos[1] = histoG;
+//								break;
+//							case "B":
+//								for(int i=0 ; i<256 ; i++) {
+//									histoB[i] = Integer.valueOf(values[i+1]);
+//								}
+//								histos[2] = histoB;
+//								break;
+//							}
+//						}
+//						else {
+//							System.out.println("Incorrect values length = " + values.length);
+//						}
+//						histoList.add(histos);
+//					}
+//					p.waitFor();
+					
+					String urlParameters = "action=login&mode=biom";
+					
+//					int countHisto = 1;
+//					StringBuilder paramsBuilder = new StringBuilder();
+//					String histoTemp = "";
+//					for(int[][] histograms : histoList) {
+//						paramsBuilder.append("&histo");
+//						paramsBuilder.append(countHisto);
+//						paramsBuilder.append("R=");
+//						histoTemp = "";
+//						for(int i=0 ; i<256 ; i++) {
+//							histoTemp += ","+histograms[0][i];
+//						}
+//						paramsBuilder.append(histoTemp.substring(1));
+//						
+//						paramsBuilder.append("&histo");
+//						paramsBuilder.append(countHisto);
+//						paramsBuilder.append("G=");
+//						histoTemp = "";
+//						for(int i=0 ; i<256 ; i++) {
+//							histoTemp += ","+histograms[1][i];
+//						}
+//						paramsBuilder.append(histoTemp.substring(1));
+//						
+//						paramsBuilder.append("&histo");
+//						paramsBuilder.append(countHisto);
+//						paramsBuilder.append("B=");
+//						histoTemp = "";
+//						for(int i=0 ; i<256 ; i++) {
+//							histoTemp += ","+histograms[2][i];
+//						}
+//						paramsBuilder.append(histoTemp.substring(1));
+//						
+//						countHisto++;
+//					}
+//					
+//					urlParameters += paramsBuilder.toString();
+//					System.out.println(urlParameters.length());
+//					System.out.println(urlParameters);
+						
+					URL url = new URL(urlString + "?" + urlParameters);
+					StringBuilder result = new StringBuilder();
+					Functions.trustSSL();
+					HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
+
+					
+					if (conn != null) {						
+						System.out.println(url + " - " + conn.getResponseCode() + " " + conn.getResponseMessage());
+						if (conn.getResponseCode() == 200) {
+							BufferedReader br = new BufferedReader(
+									new InputStreamReader(conn.getInputStream(), "UTF-8"));
+
+							while ((line = br.readLine()) != null) {
+								result.append(line + "\n");
+							}
+							br.close();
+						}
+						System.out.println(result.toString());
+						JSONObject json = new JSONObject(result.toString());
+						String registerResult = json.getString("result");
+						if(registerResult != null && registerResult.equals("ok")) {
+							System.out.println("IDENTIFICATION OK");
+						}
+						else {
+							System.out.println("IDENTIFICATION FAILED");
+						}
+					}
+				} catch(IOException ioe) {
+					ioe.printStackTrace();
+//				} catch (InterruptedException e) {
+//					e.printStackTrace();
+				}
+				
 				break;
 			}
 			

@@ -2,9 +2,9 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="D:/Université/M2 2017-2018/Cours/CartesAPuces/Client/ClientCartesAPuces/lib/json-20171018.jar" sourcepath="lib/json-20171018-sources.jar">
+	<classpathentry kind="lib" path="/home/agurato/dev/m2/cartes-a-puces/Client/ClientCartesAPuces/lib/json-20171018.jar" sourcepath="lib/json-20171018-sources.jar">
 		<attributes>
-			<attribute name="javadoc_location" value="jar:file:/D:/Université/M2%202017-2018/Cours/CartesAPuces/Client/ClientCartesAPuces/lib/json-20171018-javadoc.jar!/"/>
+			<attribute name="javadoc_location" value="jar:file:/home/agurato/dev/m2/cartes-a-puces/Client/ClientCartesAPuces/lib/json-20171018-javadoc.jar!/"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="output" path="bin"/>
