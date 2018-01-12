@@ -1,12 +1,10 @@
 package main;
 
 import java.io.BufferedReader;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Scanner;
@@ -96,7 +94,7 @@ public class MainRegister {
 			// Requête Serveur
 			Functions.trustSSL();
 
-			String mdpMD5 = Functions.stringToMD5String(mdp);
+			String mdpSHA256 = Functions.stringToSHA256String(mdp);
 			
 			String histoRStr = "zez";
 			String histoGStr = "zeze";
@@ -114,7 +112,7 @@ public class MainRegister {
 //			histoGStr = histoGStr.substring(1);
 //			histoBStr = histoBStr.substring(1);
 			
-			String urlParameters = "action=register&login=" + login + "&password=" + mdpMD5 + "&lastName=" + lastname + "&firstName=" + firstname + "&mail=" + mail
+			String urlParameters = "action=register&login=" + login + "&password=" + mdpSHA256 + "&lastName=" + lastname + "&firstName=" + firstname + "&mail=" + mail
 					+ "&histoR=" + histoRStr + "&histoG=" + histoGStr + "&histoB=" + histoBStr ;
 
 			URL url = new URL(urlString+"?"+urlParameters);
@@ -123,7 +121,6 @@ public class MainRegister {
 	
 			if (conn != null) {			
 				System.out.println(url + " - " + conn.getResponseCode() + " " + conn.getResponseMessage());
-				System.out.println(urlParameters);
 				if (conn.getResponseCode() == 200) {
 					BufferedReader br = new BufferedReader(
 							new InputStreamReader(conn.getInputStream(), "UTF-8"));
@@ -136,32 +133,33 @@ public class MainRegister {
 				System.out.println(result.toString());
 
 				// Récupérer id
-//				JSONObject json = new JSONObject(result.toString());
+				JSONObject json = new JSONObject(result.toString());
 				
-//				String id = "098f6bcd4621d373cade4e832627b4f6".toUpperCase();
-//
-//				// Ecrire dans la carte
-//				List<CardTerminal> terminauxDispos = TerminalFactory.getDefault().terminals().list();
-//				SmartCard sc = new SmartCard(terminauxDispos.get(0));
-//				// Attendre qu'il y a une carte qui se connecte
-//				System.out.println("Attente d'une carte dans le terminal");
-//				sc.getTerminal().waitForCardPresent(0);
-//				sc.connect();
-//				System.out.println("Ecriture sur la carte");
-//				Word pin0 = new Word((byte) 0xAA, (byte) 0xAA, (byte) 0xAA, (byte) 0xAA);
-//				ResponseAPDU r = sc.testPin((byte) 0x07, pin0);
-//				System.out.println(String.format("%02X %02X", r.getSW1(), r.getSW2()));
-//				
-//				sc.writeToCard((byte) 0x10, Functions.hexStringToByteArray(id));
+				String registerResult = json.getString("result");
+				if(registerResult != null && registerResult.equals("ok")) {
+					String id = json.getString("newUserID");// Ecrire dans la carte
+					List<CardTerminal> terminauxDispos = TerminalFactory.getDefault().terminals().list();
+					SmartCard sc = new SmartCard(terminauxDispos.get(0));
+					// Attendre qu'il y ait une carte qui se connecte
+					System.out.println("Attente d'une carte dans le terminal");
+					sc.getTerminal().waitForCardPresent(0);
+					sc.connect();
+					System.out.println("Ecriture sur la carte");
+					Word pin0 = new Word((byte) 0xAA, (byte) 0xAA, (byte) 0xAA, (byte) 0xAA);
+					ResponseAPDU r = sc.testPin((byte) 0x07, pin0);
+					System.out.println(String.format("%02X %02X", r.getSW1(), r.getSW2()));
+										
+					sc.writeToCard((byte) 0x10, Functions.hexStringToByteArray(id));
+				}
 			}
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
 		} catch (IOException ioe) {
 			ioe.printStackTrace();
-//		} catch (CardException e) {
-//			e.printStackTrace();
-//		} catch (WordSizeException e) {
-//			e.printStackTrace();
+		} catch (CardException e) {
+			e.printStackTrace();
+		} catch (WordSizeException e) {
+			e.printStackTrace();
 //		} catch (InterruptedException e) {
 //			e.printStackTrace();
 		}

@@ -32,6 +32,22 @@ public class Functions {
 		return sb.toString();
 	}
 
+	public static byte[] stringToSHA256Bytes(String msg) throws NoSuchAlgorithmException {
+		MessageDigest md = MessageDigest.getInstance("SHA-256");
+		md.update(msg.getBytes());
+
+		return md.digest();
+	}
+
+	public static String stringToSHA256String(String msg) throws NoSuchAlgorithmException {
+		StringBuilder sb = new StringBuilder();
+		for (byte b : stringToSHA256Bytes(msg)) {
+			sb.append(String.format("%02X", b));
+		}
+
+		return sb.toString();
+	}
+
 	public static String bytesToString(byte[] byteTab) {
 		StringBuilder sb = new StringBuilder();
 		for (byte b : byteTab) {
