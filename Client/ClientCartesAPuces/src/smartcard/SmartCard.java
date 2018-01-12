@@ -12,6 +12,8 @@ import javax.smartcardio.CommandAPDU;
 import javax.smartcardio.ResponseAPDU;
 import javax.smartcardio.TerminalFactory;
 
+import main.Functions;
+
 public class SmartCard {
 
 	private Card card;
@@ -137,30 +139,11 @@ public class SmartCard {
 	public void disconnect(boolean d) throws CardException {
 		card.disconnect(d);
 	}
-
-	public static String toString(byte[] byteTab) {
-		StringBuilder sb = new StringBuilder();
-		sb.append("[ ");
-		for (byte b : byteTab) {
-			sb.append(String.format("0x%02X ", b));
-		}
-		sb.append("]");
-		return sb.toString();
-	}
 	
 	public CardTerminal getTerminal(){
 		return this.terminal;
 	}
 	
-	public static byte[] hexStringToByteArray(String s) {
-	    int len = s.length();
-	    byte[] data = new byte[len / 2];
-	    for (int i = 0; i < len; i += 2) {
-	        data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4)
-	                             + Character.digit(s.charAt(i+1), 16));
-	    }
-	    return data;
-	}
 	public static void main(String[] args) throws CardException, WordSizeException {
 		ResponseAPDU r;
 
@@ -179,7 +162,7 @@ public class SmartCard {
 			md.update(password.getBytes());
 
 			byte byteData[] = md.digest();
-			System.out.println(toString(byteData));
+			System.out.println(Functions.toString(byteData));
 			sc.writeToCard((byte) 0x10, byteData);
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
@@ -188,10 +171,10 @@ public class SmartCard {
 		}
 
 		ArrayList<ResponseAPDU> responses = sc.readCard((byte) 0x10, 4);
-		System.out.println(toString(responses.get(0).getData()));
-		System.out.println(toString(responses.get(1).getData()));
-		System.out.println(toString(responses.get(2).getData()));
-		System.out.println(toString(responses.get(3).getData()));
+		System.out.println(Functions.toString(responses.get(0).getData()));
+		System.out.println(Functions.toString(responses.get(1).getData()));
+		System.out.println(Functions.toString(responses.get(2).getData()));
+		System.out.println(Functions.toString(responses.get(3).getData()));
 
 		sc.disconnect(false);
 	}

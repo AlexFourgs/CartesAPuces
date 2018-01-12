@@ -2,6 +2,7 @@ package com.atelierBio.dao;
 
 import java.sql.Connection;
 
+import com.atelierBio.bean.User;
 import com.atelierBio.connexion.Connexion;
 
 public abstract class DAO<T> {
@@ -12,37 +13,43 @@ public abstract class DAO<T> {
   }
    
   /**
-  * Méthode de création
+  * Mï¿½thode de crï¿½ation
   * @param obj
   * @return boolean 
+ * @throws Exception 
   */
-  public abstract boolean create(T obj);
+  public abstract boolean create(T obj) throws Exception;
 
   /**
-  * Méthode pour effacer
+  * Mï¿½thode pour effacer
   * @param obj
   * @return boolean 
   */
   public abstract boolean delete(T obj);
 
   /**
-  * Méthode de mise à jour
+  * Mï¿½thode de mise ï¿½ jour
   * @param obj
   * @return boolean
   */
   public abstract boolean update(T obj);
 
   /**
-  * Méthode de recherche des informations
+  * Mï¿½thode de recherche des informations
   * @param id
   * @return T
   */
   public abstract T find(int id);
 
   /**
-  * Méthode de recherche des informations
+  * Mï¿½thode de recherche des informations
   * @param id
   * @return T
   */
   public abstract T find(String id);
+
+public User find(String login, String password) {
+	// TODO Auto-generated method stub
+	return null;
+}
 }
