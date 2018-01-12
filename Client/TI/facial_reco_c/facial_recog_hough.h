@@ -9,6 +9,8 @@
 #define FACIAL_RECOG_HOUGH_H_
 #include <opencv2/opencv.hpp>
 #include <cmath>
+#include <map>
+#include <vector>
 
 
 #endif /* FACIAL_RECOG_HOUGH_H_ */
