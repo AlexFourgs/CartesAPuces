@@ -1,6 +1,7 @@
 package main;
 
 import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
@@ -28,6 +29,7 @@ public class MainLogin {
 		Runtime runtime = Runtime.getRuntime();
 		Process p;
 		BufferedReader is;
+		BufferedReader br;
 		String line;
 
 		try {
@@ -94,7 +96,7 @@ public class MainLogin {
 					if (conn != null) {						
 						System.out.println(url + " - " + conn.getResponseCode() + " " + conn.getResponseMessage());
 						if (conn.getResponseCode() == 200) {
-							BufferedReader br = new BufferedReader(
+							br = new BufferedReader(
 									new InputStreamReader(conn.getInputStream(), "UTF-8"));
 
 							while ((line = br.readLine()) != null) {
@@ -122,14 +124,14 @@ public class MainLogin {
 			case 2:
 				try {
 					// Récupérer biométrie
-//					p = runtime.exec("./iris.out");
+					p = runtime.exec("./iris.out");
 //					is = new BufferedReader(new InputStreamReader(p.getInputStream()));
-//					
-//					ArrayList<int[][]> histoList = new ArrayList<int[][]>();
-//					int[][] histos = new int[3][];
-//					int[] histoR = new int[256];
-//					int[] histoG = new int[256];
-//					int[] histoB = new int[256];
+					
+					ArrayList<int[][]> histoList = new ArrayList<int[][]>();
+					int[][] histos = new int[3][];
+					int[] histoR = new int[256];
+					int[] histoG = new int[256];
+					int[] histoB = new int[256];
 //					
 //					while((line = is.readLine()) != null) {
 //						System.out.println(line);
@@ -161,47 +163,81 @@ public class MainLogin {
 //						}
 //						histoList.add(histos);
 //					}
-//					p.waitFor();
+					p.waitFor();
+					
+					FileReader fr = new FileReader("histo.txt");
+					br = new BufferedReader(fr);
+
+					while ((line = br.readLine()) != null) {
+						System.out.println(line);
+						String[] values = line.split(",");
+						if(values.length == 257) {
+							switch(values[0]) {
+							case "R":
+								for(int i=0 ; i<256 ; i++) {
+									histoR[i] = Integer.valueOf(values[i+1]);
+								}
+								histos[0] = histoR;
+								break;
+							case "G":
+								for(int i=0 ; i<256 ; i++) {
+									histoG[i] = Integer.valueOf(values[i+1]);
+								}
+								histos[1] = histoG;
+								break;
+							case "B":
+								for(int i=0 ; i<256 ; i++) {
+									histoB[i] = Integer.valueOf(values[i+1]);
+								}
+								histos[2] = histoB;
+								break;
+							}
+						}
+						else {
+							System.out.println("Incorrect values length = " + values.length);
+						}
+						histoList.add(histos);
+					}
 					
 					String urlParameters = "action=login&mode=biom";
 					
-//					int countHisto = 1;
-//					StringBuilder paramsBuilder = new StringBuilder();
-//					String histoTemp = "";
-//					for(int[][] histograms : histoList) {
-//						paramsBuilder.append("&histo");
-//						paramsBuilder.append(countHisto);
-//						paramsBuilder.append("R=");
-//						histoTemp = "";
-//						for(int i=0 ; i<256 ; i++) {
-//							histoTemp += ","+histograms[0][i];
-//						}
-//						paramsBuilder.append(histoTemp.substring(1));
-//						
-//						paramsBuilder.append("&histo");
-//						paramsBuilder.append(countHisto);
-//						paramsBuilder.append("G=");
-//						histoTemp = "";
-//						for(int i=0 ; i<256 ; i++) {
-//							histoTemp += ","+histograms[1][i];
-//						}
-//						paramsBuilder.append(histoTemp.substring(1));
-//						
-//						paramsBuilder.append("&histo");
-//						paramsBuilder.append(countHisto);
-//						paramsBuilder.append("B=");
-//						histoTemp = "";
-//						for(int i=0 ; i<256 ; i++) {
-//							histoTemp += ","+histograms[2][i];
-//						}
-//						paramsBuilder.append(histoTemp.substring(1));
-//						
-//						countHisto++;
-//					}
-//					
-//					urlParameters += paramsBuilder.toString();
-//					System.out.println(urlParameters.length());
-//					System.out.println(urlParameters);
+					int countHisto = 1;
+					StringBuilder paramsBuilder = new StringBuilder();
+					String histoTemp = "";
+					for(int[][] histograms : histoList) {
+						paramsBuilder.append("&histo");
+						paramsBuilder.append(countHisto);
+						paramsBuilder.append("R=");
+						histoTemp = "";
+						for(int i=0 ; i<256 ; i++) {
+							histoTemp += ","+histograms[0][i];
+						}
+						paramsBuilder.append(histoTemp.substring(1));
+						
+						paramsBuilder.append("&histo");
+						paramsBuilder.append(countHisto);
+						paramsBuilder.append("G=");
+						histoTemp = "";
+						for(int i=0 ; i<256 ; i++) {
+							histoTemp += ","+histograms[1][i];
+						}
+						paramsBuilder.append(histoTemp.substring(1));
+						
+						paramsBuilder.append("&histo");
+						paramsBuilder.append(countHisto);
+						paramsBuilder.append("B=");
+						histoTemp = "";
+						for(int i=0 ; i<256 ; i++) {
+							histoTemp += ","+histograms[2][i];
+						}
+						paramsBuilder.append(histoTemp.substring(1));
+						
+						countHisto++;
+					}
+					
+					urlParameters += paramsBuilder.toString();
+					System.out.println(urlParameters.length());
+					System.out.println(urlParameters);
 						
 					URL url = new URL(urlString + "?" + urlParameters);
 					StringBuilder result = new StringBuilder();
@@ -212,7 +248,7 @@ public class MainLogin {
 					if (conn != null) {						
 						System.out.println(url + " - " + conn.getResponseCode() + " " + conn.getResponseMessage());
 						if (conn.getResponseCode() == 200) {
-							BufferedReader br = new BufferedReader(
+							br = new BufferedReader(
 									new InputStreamReader(conn.getInputStream(), "UTF-8"));
 
 							while ((line = br.readLine()) != null) {
@@ -232,8 +268,8 @@ public class MainLogin {
 					}
 				} catch(IOException ioe) {
 					ioe.printStackTrace();
-//				} catch (InterruptedException e) {
-//					e.printStackTrace();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
 				}
 				
 				break;
