@@ -7,7 +7,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,13 +18,15 @@ import javax.smartcardio.CardTerminal;
 import javax.smartcardio.ResponseAPDU;
 import javax.smartcardio.TerminalFactory;
 
+import org.json.JSONObject;
+
 import smartcard.SmartCard;
 import smartcard.Word;
 
 public class MainLogin {
 
 	public static void main(String[] args) {
-		String urlString = "http://localhost/carteapuces.php";
+		String urlString = "https://192.168.1.3:8443/AtelierBiometrie/AtelierBio";
 		Scanner scan = new Scanner(System.in);
 
 		try {
@@ -52,8 +53,8 @@ public class MainLogin {
 			}
 			System.out.println(String.format("%02X %02X", r.getSW1(), r.getSW2()));
 
-			// Récpérer l'id
-			ArrayList<ResponseAPDU> responses = sc.readCard((byte) 0x10, 4);
+			// Récupérer l'id
+			ArrayList<ResponseAPDU> responses = sc.readCard((byte) 0x10, 8);
 			String id = "";
 			for (ResponseAPDU resp : responses) {
 				byte[] b = resp.getData();
@@ -81,30 +82,15 @@ public class MainLogin {
 				String mdp = scan.nextLine();
 
 				try {
-					String mdpMD5 = Functions.stringToMD5String(mdp);
+					String mdpSHA256 = Functions.stringToSHA256String(mdp);
 
-					URL url = new URL(urlString);
+					String urlParameters = "action=login&login=" + login + "&password=" + mdpSHA256 + "&id=" + id;
+					URL url = new URL(urlString + "?" + urlParameters);
 					StringBuilder result = new StringBuilder();
-					// trustSSL();
-					HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+					Functions.trustSSL();
+					HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
 
-					if (conn != null) {
-						String urlParameters = "action=login&login=" + login + "&mdp=" + mdpMD5;
-						byte[] postData = urlParameters.getBytes(StandardCharsets.UTF_8);
-						int postDataLength = postData.length;
-
-						conn.setRequestMethod("POST");
-						conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-						conn.setRequestProperty("charset", "utf-8");
-						conn.setRequestProperty("Content-Length", Integer.toString(postDataLength));
-						conn.setRequestProperty("User-Agent",
-								"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36");
-						conn.setDoOutput(true);
-						DataOutputStream wr = new DataOutputStream(conn.getOutputStream());
-						wr.writeBytes(urlParameters);
-						wr.flush();
-						wr.close();
-						
+					if (conn != null) {						
 						System.out.println(url + " - " + conn.getResponseCode() + " " + conn.getResponseMessage());
 						if (conn.getResponseCode() == 200) {
 							BufferedReader br = new BufferedReader(
@@ -117,6 +103,14 @@ public class MainLogin {
 							br.close();
 						}
 						System.out.println(result.toString());
+						JSONObject json = new JSONObject(result.toString());
+						String registerResult = json.getString("result");
+						if(registerResult != null && registerResult.equals("ok")) {
+							System.out.println("IDENTIFICATION OK");
+						}
+						else {
+							System.out.println("IDENTIFICATION FAILED");
+						}
 					}
 				} catch (NoSuchAlgorithmException e) {
 					e.printStackTrace();
@@ -133,9 +127,6 @@ public class MainLogin {
 			e.printStackTrace();
 		}
 		scan.close();
-
-		// Connection au serveur et check
-		//
 	}
 
 }
