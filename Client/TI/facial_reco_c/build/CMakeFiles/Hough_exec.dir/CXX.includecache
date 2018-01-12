@@ -1,0 +1,30 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/antoine/git/CartesAPuces/Client/TI/facial_reco_c/faceDetector.cpp
+faceDetector.h
+/home/antoine/git/CartesAPuces/Client/TI/facial_reco_c/faceDetector.h
+
+/home/antoine/git/CartesAPuces/Client/TI/facial_reco_c/faceDetector.h
+map
+-
+vector
+-
+opencv/cv.hpp
+-
+iostream
+-
+math.h
+-
+
+/home/antoine/git/CartesAPuces/Client/TI/facial_reco_c/main.cpp
+iostream
+-
+faceDetector.h
+/home/antoine/git/CartesAPuces/Client/TI/facial_reco_c/faceDetector.h
+
