@@ -12,6 +12,7 @@
 #include <opencv/cv.hpp>
 #include <iostream>
 #include <math.h>
+#include <fstream>
 namespace std {
 
 /*

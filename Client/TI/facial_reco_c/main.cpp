@@ -6,9 +6,10 @@
  */
 #include <iostream>
 #include "faceDetector.h"
+
 using namespace cv;
 using namespace std;
-
+#define DEMO
 int main(int argc, char **argv) {
 
     VideoCapture cap(0); // open the default camera
@@ -46,9 +47,12 @@ int main(int argc, char **argv) {
         detector.locateEye(frame , "Eye");
         detector.drawImg(frame , "final");
         detector.compute_histogram(frame , "hist");
-        detector.print_histogram();
+        cv::waitKey(1);
 
 #ifndef DEMO
+
+        detector.print_histogram();
+
         count++;
        if(count > 20 ) break;
 #endif

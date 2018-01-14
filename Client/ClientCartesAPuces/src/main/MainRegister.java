@@ -1,10 +1,13 @@
 package main;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -27,7 +30,7 @@ public class MainRegister {
 		Scanner scan = new Scanner(System.in);
 		Runtime runtime = Runtime.getRuntime();
 		Process p;
-		BufferedReader is;
+		BufferedReader is, br;
 		String line;
 		
 		// Demander login
@@ -52,65 +55,89 @@ public class MainRegister {
 		
 		try {
 			// Récupérer biométrie
-//			p = runtime.exec("./iris.out");
-//			is = new BufferedReader(new InputStreamReader(p.getInputStream()));
-//			
-//			int[] histoR = new int[256];
-//			int[] histoG = new int[256];
-//			int[] histoB = new int[256];
-//			
-//			while((line = is.readLine()) != null) {
-//				System.out.println(line);
-//				String[] values = line.split(",");
-//				if(values.length == 257) {
-//					switch(values[0]) {
-//					case "R":
-//						for(int i=0 ; i<256 ; i++) {
-//							histoR[i] = Integer.valueOf(values[i+1]);
-//						}
-//						break;
-//					case "G":
-//						for(int i=0 ; i<256 ; i++) {
-//							histoG[i] = Integer.valueOf(values[i+1]);
-//						}
-//						break;
-//					case "B":
-//						for(int i=0 ; i<256 ; i++) {
-//							histoB[i] = Integer.valueOf(values[i+1]);
-//						}
-//						break;
-//					}
-//				}
-//				else {
-//					System.out.println("Incorrect values length = " + values.length);
-//				}
-//			}
-//			p.waitFor();
+			p = new ProcessBuilder("./Hough_exec").start();
+			is = new BufferedReader(new InputStreamReader(p.getInputStream()));
 			
-			// Requête Serveur
+			ArrayList<int[][]> histoList = new ArrayList<int[][]>();
+			int[][] histos = new int[3][];
+			int[] histoR = new int[256];
+			int[] histoG = new int[256];
+			int[] histoB = new int[256];
+			
+			p.waitFor();
+			
+			FileReader fr = new FileReader("./histo.txt");
+			
+			br = new BufferedReader(fr);
+
+			while ((line = br.readLine()) != null) {
+				System.out.println(line);
+				String[] values = line.split(",");
+				if(values.length == 257) {
+					switch(values[0]) {
+					case "R":
+						for(int i=0 ; i<256 ; i++) {
+							histoR[i] = Integer.valueOf(values[i+1]);
+						}
+						histos[0] = histoR;
+						break;
+					case "G":
+						for(int i=0 ; i<256 ; i++) {
+							histoG[i] = Integer.valueOf(values[i+1]);
+						}
+						histos[1] = histoG;
+						break;
+					case "B":
+						for(int i=0 ; i<256 ; i++) {
+							histoB[i] = Integer.valueOf(values[i+1]);
+						}
+						histos[2] = histoB;
+						break;
+					}
+				}
+				else {
+					System.out.println("Incorrect values length = " + values.length);
+				}
+				histoList.add(histos);
+			}
+			fr.close();	
+			new File("./histo.txt").delete();
 			Functions.trustSSL();
 
 			String mdpSHA256 = Functions.stringToSHA256String(mdp);
-			
-			String histoRStr = "";
-			String histoGStr = "";
-			String histoBStr = "";
-//			for(int i=0 ; i<256 ; i++) {
-//				histoRStr += ","+histoR[i]; 
-//			}
-//			for(int i=0 ; i<256 ; i++) {
-//				histoGStr += ","+histoG[i]; 
-//			}
-//			for(int i=0 ; i<256 ; i++) {
-//				histoBStr += ","+histoB[i]; 
-//			}
-//			histoRStr = histoRStr.substring(1);
-//			histoGStr = histoGStr.substring(1);
-//			histoBStr = histoBStr.substring(1);
-//			
-			String urlParameters = "action=register&login=" + login + "&password=" + mdpSHA256 + "&lastName=" + lastname + "&firstName=" + firstname + "&mail=" + mail
-					+ "&histoR=" + histoRStr + "&histoG=" + histoGStr + "&histoB=" + histoBStr ;
+			String urlParameters = "action=register&login=" + login + "&password=" + mdpSHA256 + "&lastName=" + lastname + "&firstName=" + firstname + "&mail=" + mail;
 
+			int countHisto = 1;
+			StringBuilder paramsBuilder = new StringBuilder();
+			String histoTemp = "";
+			int[][] histograms = histoList.get(0);
+
+			paramsBuilder.append("&histoR=");
+			histoTemp = "";
+			System.out.println(histograms[0].length);
+			for(int i=0 ; i<256 ; i++) {
+				histoTemp += ","+histograms[0][i];
+			}
+			paramsBuilder.append(histoTemp.substring(1));
+			
+			paramsBuilder.append("&histoG=");
+			histoTemp = "";
+			for(int i=0 ; i<256 ; i++) {
+				histoTemp += ","+histograms[1][i];
+			}
+			paramsBuilder.append(histoTemp.substring(1));
+			
+			paramsBuilder.append("&histoB=");
+			histoTemp = "";
+			for(int i=0 ; i<256 ; i++) {
+				histoTemp += ","+histograms[2][i];
+			}
+			paramsBuilder.append(histoTemp.substring(1));
+			
+			countHisto++;
+
+			
+			urlParameters += paramsBuilder.toString();
 			URL url = new URL(urlString+"?"+urlParameters);
 			StringBuilder result = new StringBuilder();
 			HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
@@ -118,7 +145,7 @@ public class MainRegister {
 			if (conn != null) {			
 				System.out.println(url + " - " + conn.getResponseCode() + " " + conn.getResponseMessage());
 				if (conn.getResponseCode() == 200) {
-					BufferedReader br = new BufferedReader(
+					br = new BufferedReader(
 							new InputStreamReader(conn.getInputStream(), "UTF-8"));
 	
 					while ((line = br.readLine()) != null) {
@@ -158,8 +185,8 @@ public class MainRegister {
 			e.printStackTrace();
 		} catch (WordSizeException e) {
 			e.printStackTrace();
-//		} catch (InterruptedException e) {
-//			e.printStackTrace();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
 		scan.close();
 	}

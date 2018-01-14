@@ -3,6 +3,7 @@ find_package(OpenCV REQUIRED)
 
 
 option(GRAPHIC  ON)
+option(DEMO  ON)
 
 
 
@@ -15,6 +16,11 @@ add_executable(Hough_exec
 include_directories(${OpenCV_INCLUDE_DIRS})
 target_link_libraries(Hough_exec ${OpenCV_LIBRARIES})
 
+
+if(${GRAPHIC})
+  target_compile_definitions(Hough_exec PRIVATE GRAPHIC)
+  
+endif(${GRAPHIC})
 
 if(${GRAPHIC})
   target_compile_definitions(Hough_exec PRIVATE GRAPHIC)

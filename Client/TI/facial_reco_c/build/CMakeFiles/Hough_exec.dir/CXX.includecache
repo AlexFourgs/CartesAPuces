@@ -21,6 +21,8 @@ iostream
 -
 math.h
 -
+fstream
+-
 
 /home/antoine/git/CartesAPuces/Client/TI/facial_reco_c/main.cpp
 iostream

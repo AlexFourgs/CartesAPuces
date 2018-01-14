@@ -1,6 +1,7 @@
 package main;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -124,8 +125,9 @@ public class MainLogin {
 			case 2:
 				try {
 					// Récupérer biométrie
-					p = runtime.exec("./iris.out");
-//					is = new BufferedReader(new InputStreamReader(p.getInputStream()));
+//					p = runtime.exec("/home/antoine/git/CartesAPuces/Client/TI/facial_reco_c/build/Hough_exec");
+					p = new ProcessBuilder("./Hough_exec").start();
+					is = new BufferedReader(new InputStreamReader(p.getInputStream()));
 					
 					ArrayList<int[][]> histoList = new ArrayList<int[][]>();
 					int[][] histos = new int[3][];
@@ -165,7 +167,8 @@ public class MainLogin {
 //					}
 					p.waitFor();
 					
-					FileReader fr = new FileReader("histo.txt");
+					FileReader fr = new FileReader("./histo.txt");
+					
 					br = new BufferedReader(fr);
 
 					while ((line = br.readLine()) != null) {
@@ -198,43 +201,36 @@ public class MainLogin {
 						}
 						histoList.add(histos);
 					}
-					
+					fr.close();	
+					new File("./histo.txt").delete();
 					String urlParameters = "action=login&mode=biom";
 					
-					int countHisto = 1;
 					StringBuilder paramsBuilder = new StringBuilder();
 					String histoTemp = "";
-					for(int[][] histograms : histoList) {
-						paramsBuilder.append("&histo");
-						paramsBuilder.append(countHisto);
-						paramsBuilder.append("R=");
-						histoTemp = "";
-						for(int i=0 ; i<256 ; i++) {
-							histoTemp += ","+histograms[0][i];
-						}
-						paramsBuilder.append(histoTemp.substring(1));
-						
-						paramsBuilder.append("&histo");
-						paramsBuilder.append(countHisto);
-						paramsBuilder.append("G=");
-						histoTemp = "";
-						for(int i=0 ; i<256 ; i++) {
-							histoTemp += ","+histograms[1][i];
-						}
-						paramsBuilder.append(histoTemp.substring(1));
-						
-						paramsBuilder.append("&histo");
-						paramsBuilder.append(countHisto);
-						paramsBuilder.append("B=");
-						histoTemp = "";
-						for(int i=0 ; i<256 ; i++) {
-							histoTemp += ","+histograms[2][i];
-						}
-						paramsBuilder.append(histoTemp.substring(1));
-						
-						countHisto++;
+					int[][] histograms = histoList.get(0);
+
+					paramsBuilder.append("&histoR=");
+					histoTemp = "";
+					System.out.println(histograms[0].length);
+					for(int i=0 ; i<256 ; i++) {
+						histoTemp += ","+histograms[0][i];
 					}
+					paramsBuilder.append(histoTemp.substring(1));
 					
+					paramsBuilder.append("&histoG=");
+					histoTemp = "";
+					for(int i=0 ; i<256 ; i++) {
+						histoTemp += ","+histograms[1][i];
+					}
+					paramsBuilder.append(histoTemp.substring(1));
+					
+					paramsBuilder.append("&histoB=");
+					histoTemp = "";
+					for(int i=0 ; i<256 ; i++) {
+						histoTemp += ","+histograms[2][i];
+					}
+					paramsBuilder.append(histoTemp.substring(1));
+										
 					urlParameters += paramsBuilder.toString();
 					System.out.println(urlParameters.length());
 					System.out.println(urlParameters);

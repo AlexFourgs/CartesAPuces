@@ -31,133 +31,158 @@ void faceDetector::locateFace(cv::Mat& img, string windowPrefix) {
 	_facesCenter = recognizeShape(img, _lookUTableEllipse, windowPrefix);
 }
 
-void faceDetector::reset_histograms(){
+void faceDetector::reset_histograms() {
 	for (int i = 0; i < 2; i++) {
 		for (int j = 0; j < 3; j++) {
 			for (int k = 0; k < 256; k++) {
-				_histo[i][j][k]=0;
+				_histo[i][j][k] = 0;
 			}
 		}
 
-
-
 	}
 }
-void faceDetector::compute_histogram(cv::Mat& img, string windowPrefix){
+void faceDetector::compute_histogram(cv::Mat& img, string windowPrefix) {
 	reset_histograms();
-	float max_left[3] = { -INFINITY ,-INFINITY,-INFINITY};
-	float max_right[3] = { -INFINITY ,-INFINITY,-INFINITY};
-	for(int col_cursor =  _leftEye.x - 30 ; col_cursor < _leftEye.x + 30 ; col_cursor++){
-		for(int row_cursor =  _leftEye.y - 30 ; row_cursor < _leftEye.y + 30 ; row_cursor++){
-			 cv::Vec3b pixel = img.at<cv::Vec3b>(row_cursor , col_cursor);
+	float max_left[3] = { -INFINITY, -INFINITY, -INFINITY };
+	float max_right[3] = { -INFINITY, -INFINITY, -INFINITY };
+	for (int col_cursor = _leftEye.x - 30; col_cursor < _leftEye.x + 30;
+			col_cursor++) {
+		for (int row_cursor = _leftEye.y - 30; row_cursor < _leftEye.y + 30;
+				row_cursor++) {
+			cv::Vec3b pixel = img.at<cv::Vec3b>(row_cursor, col_cursor);
 			_histo[0][0][pixel[0]]++;
 			_histo[0][1][pixel[1]]++;
 			_histo[0][2][pixel[2]]++;
 
-			max_left[0] = (_histo[0][0][pixel[0]]>max_left[0])?_histo[0][0][pixel[0]]:max_left[0];
-			max_left[1] = (_histo[0][1][pixel[1]]>max_left[1])?_histo[0][1][pixel[1]]:max_left[1];
-			max_left[2] = (_histo[0][2][pixel[2]]>max_left[2])?_histo[0][2][pixel[2]]:max_left[2];
+			max_left[0] =
+					(_histo[0][0][pixel[0]] > max_left[0]) ?
+							_histo[0][0][pixel[0]] : max_left[0];
+			max_left[1] =
+					(_histo[0][1][pixel[1]] > max_left[1]) ?
+							_histo[0][1][pixel[1]] : max_left[1];
+			max_left[2] =
+					(_histo[0][2][pixel[2]] > max_left[2]) ?
+							_histo[0][2][pixel[2]] : max_left[2];
 		}
 	}
-	for(int col_cursor =  _rightEye.x - 30 ; col_cursor < _rightEye.x + 30 ; col_cursor++){
-		for(int row_cursor =  _rightEye.y - 30 ; row_cursor < _rightEye.y + 30 ; row_cursor++){
-			 cv::Vec3b pixel = img.at<cv::Vec3b>(row_cursor , col_cursor);
+	for (int col_cursor = _rightEye.x - 30; col_cursor < _rightEye.x + 30;
+			col_cursor++) {
+		for (int row_cursor = _rightEye.y - 30; row_cursor < _rightEye.y + 30;
+				row_cursor++) {
+			cv::Vec3b pixel = img.at<cv::Vec3b>(row_cursor, col_cursor);
 			_histo[1][0][pixel[0]]++;
 			_histo[1][1][pixel[1]]++;
 			_histo[1][2][pixel[2]]++;
-			max_right[0] = (_histo[1][0][pixel[0]]>max_right[0])?_histo[1][0][pixel[0]]:max_right[0];
-			max_right[1] = (_histo[1][1][pixel[1]]>max_right[1])?_histo[1][1][pixel[1]]:max_right[1];
-			max_right[2] = (_histo[1][2][pixel[2]]>max_right[2])?_histo[1][2][pixel[2]]:max_right[2];
+			max_right[0] =
+					(_histo[1][0][pixel[0]] > max_right[0]) ?
+							_histo[1][0][pixel[0]] : max_right[0];
+			max_right[1] =
+					(_histo[1][1][pixel[1]] > max_right[1]) ?
+							_histo[1][1][pixel[1]] : max_right[1];
+			max_right[2] =
+					(_histo[1][2][pixel[2]] > max_right[2]) ?
+							_histo[1][2][pixel[2]] : max_right[2];
 		}
 	}
 
 #ifdef GRAPHIC
 	cv::Mat hist_left(cv::Size(512 , 120) , CV_8UC3 , cv::Scalar(0,0,0));
 	cv::Mat hist_right(cv::Size(512 , 120) , CV_8UC3 , cv::Scalar(0,0,0));
-		for(int i = 0; i < 3 ; i++) {
-			for(int j = 0; j < 255 ; j++){
-				int nb_pixel=	_histo[0][i][j];
-				cv::Point pointstart( 2*j  , (40 * (i+1) ) - 39 * (float)( nb_pixel / max_right[i]) );
-				cv::Point pointend( 2*j+2 + 2 , (40 * (i+1)) + 10 );
-				switch(i){
+	for(int i = 0; i < 3; i++) {
+		for(int j = 0; j < 255; j++) {
+			int nb_pixel= _histo[0][i][j];
+			cv::Point pointstart( 2*j , (40 * (i+1) ) - 39 * (float)( nb_pixel / max_right[i]) );
+			cv::Point pointend( 2*j+2 + 2 , (40 * (i+1)) + 10 );
+			switch(i) {
 				case 0:
-					cv::rectangle(hist_left ,pointstart , pointend,cv::Scalar(255  , 0 , 0 ) , -1 );
-					break;
+				cv::rectangle(hist_left ,pointstart , pointend,cv::Scalar(255 , 0 , 0 ) , -1 );
+				break;
 
 				case 1:
-					cv::rectangle(hist_left ,pointstart , pointend,cv::Scalar(0  , 255 , 0 ) , -1 );
-					break;
+				cv::rectangle(hist_left ,pointstart , pointend,cv::Scalar(0 , 255 , 0 ) , -1 );
+				break;
 				case 2:
-					cv::rectangle(hist_left ,pointstart , pointend,cv::Scalar( 0 , 0 , 255 ) , -1 );
+				cv::rectangle(hist_left ,pointstart , pointend,cv::Scalar( 0 , 0 , 255 ) , -1 );
+				break;
+			}
+
+		}
+		for(int i = 0; i < 3; i++) {
+			for(int j = 0; j < 265; j++) {
+				int nb_pixel= _histo[1][i][j];
+				cv::Point pointstart( 2*j , (40 * (i+1) ) - 39 * (float)( nb_pixel / max_right[i]) );
+				cv::Point pointend( 2*j+2 + 2 , (40 * (i+1)) + 10 );
+				switch(i) {
+					case 0:
+					cv::rectangle(hist_right ,pointstart , pointend,cv::Scalar(255 , 0 , 0 ) , -1 );
+					break;
+
+					case 1:
+					cv::rectangle(hist_right ,pointstart , pointend,cv::Scalar(0 , 255 , 0 ) , -1 );
+					break;
+					case 2:
+					cv::rectangle(hist_right ,pointstart , pointend,cv::Scalar( 0 , 0 , 255 ) , -1 );
 					break;
 				}
 
-
-
 			}
-			for(int i = 0; i < 3 ; i++) {
-						for(int j = 0; j < 265 ; j++){
-							int nb_pixel=	_histo[1][i][j];
-							cv::Point pointstart( 2*j  , (40 * (i+1) ) - 39 * (float)( nb_pixel / max_right[i]) );
-							cv::Point pointend( 2*j+2 + 2 , (40 * (i+1)) + 10 );
-							switch(i){
-							case 0:
-								cv::rectangle(hist_right ,pointstart , pointend,cv::Scalar(255  , 0 , 0 ) , -1 );
-								break;
-
-							case 1:
-								cv::rectangle(hist_right ,pointstart , pointend,cv::Scalar(0  , 255 , 0 ) , -1 );
-								break;
-							case 2:
-								cv::rectangle(hist_right ,pointstart , pointend,cv::Scalar( 0 , 0 , 255 ) , -1 );
-								break;
-							}
-
-
-
-						}
-			}
-			cv::imshow(windowPrefix+"_left_eye_histoRGB" , hist_left);
-			cv::imshow(windowPrefix+"_right_eye_histoRGB" , hist_right);
 		}
+		cv::imshow(windowPrefix+"_left_eye_histoRGB" , hist_left);
+		cv::imshow(windowPrefix+"_right_eye_histoRGB" , hist_right);
+	}
 #endif
 
 }
-void faceDetector::print_histogram(){
-	std::cout << "R";
-	for(int i = 0 ; i < 255 ; i++ ){
-		std::cout << "," << _histo[0][2][i];
-	}
-	std::cout <<std::endl<< "G";
-		for(int i = 0 ; i < 255 ; i++ ){
-			std::cout << "," << _histo[0][1][i];
+void faceDetector::print_histogram() {
+
+	std::ofstream fichier("histo.txt", ios::out|ios::app); // ouverture en écriture avec effacement du fichier ouvert
+
+	if (fichier)
+
+	{
+
+		fichier << "R";
+
+		for (int i = 0; i < 256; i++) {
+			fichier << "," << _histo[0][2][i];
 		}
-	std::cout <<  std::endl<<"B";
-			for(int i = 0 ; i < 255 ; i++ ){
-				std::cout << "," << _histo[0][1][i];
-			}
-			std::cout <<  std::endl;
+		fichier << std::endl << "G";
+		for (int i = 0; i < 256; i++) {
+			fichier << "," << _histo[0][1][i];
+		}
+		fichier << std::endl << "B";
+		for (int i = 0; i < 256; i++) {
+			fichier << "," << _histo[0][0][i];
+		}
+		fichier << std::endl;
+	}
+
+
+	else
+		cerr << "Impossible d'ouvrir le fichier !" << endl;
+
 }
 
-void faceDetector::drawImg(cv::Mat& img , string windowPrefix){
+void faceDetector::drawImg(cv::Mat& img, string windowPrefix) {
 	cv::Mat eye_img;
-		img.copyTo(eye_img);
-		cv::circle(eye_img , _leftEye , 10 , cv::Scalar(255,0,0) , 1);
-		cv::circle(eye_img , _rightEye , 10 , cv::Scalar(255,0,0) , 1);
-		cv::circle(eye_img , _facesCenter , 10 , cv::Scalar(255,255,0) , -1);
-		cv::ellipse( eye_img, _facesCenter, cv::Size( 75.0, 150 ), 0, 0, 360, cv::Scalar( 255, 0, 0 ), 1, 8 );
-		cv::imshow(windowPrefix +"finalOutput",eye_img);
+	img.copyTo(eye_img);
+	cv::circle(eye_img, _leftEye, 10, cv::Scalar(255, 0, 0), 1);
+	cv::circle(eye_img, _rightEye, 10, cv::Scalar(255, 0, 0), 1);
+	cv::circle(eye_img, _facesCenter, 10, cv::Scalar(255, 255, 0), -1);
+	cv::ellipse(eye_img, _facesCenter, cv::Size(75.0, 150), 0, 0, 360,
+			cv::Scalar(255, 0, 0), 1, 8);
+	cv::imshow(windowPrefix + "finalOutput", eye_img);
 }
 
 void faceDetector::locateEye(cv::Mat& img, string windowPrefix) {
 
 	int windows_size = min(img.cols / 6, img.rows / 6);
-	int left_x = max(_facesCenter.x - windows_size -1, 1);
-	int left_y = max(_facesCenter.y - windows_size -1 , 1);
+	int left_x = max(_facesCenter.x - windows_size - 1, 1);
+	int left_y = max(_facesCenter.y - windows_size - 1, 1);
 	int left_w = min(img.cols - _facesCenter.x - 2, windows_size);
 	int left_h = min(img.rows - _facesCenter.y - 2, windows_size);
 	int right_x = max(_facesCenter.x, 1);
-	int right_y = max(_facesCenter.y - windows_size -1, 1);
+	int right_y = max(_facesCenter.y - windows_size - 1, 1);
 	int right_w = min(img.cols - _facesCenter.x - 2, windows_size);
 	int right_h = min(img.rows - _facesCenter.y - 2, windows_size);
 	cv::Rect left_eye_rect(left_x, left_y, left_w, left_h);
@@ -166,13 +191,12 @@ void faceDetector::locateEye(cv::Mat& img, string windowPrefix) {
 	cv::Mat left_eye_mat = img(left_eye_rect);
 	cv::Mat right_eye_mat = img(right_eye_rect);
 	cv::Point left_eye = recognizeShape(left_eye_mat, _lookUTableEyes,
-			windowPrefix + "_left_eye" , false);
+			windowPrefix + "_left_eye", false);
 	cv::Point right_eye = recognizeShape(right_eye_mat, _lookUTableEyes,
 			windowPrefix + "_right_eye", false);
 
 	_leftEye = cv::Point(left_x + left_eye.x, left_eye.y + left_y);
-	_rightEye = cv::Point(right_x + right_eye.x,
-			right_eye.y + right_y);
+	_rightEye = cv::Point(right_x + right_eye.x, right_eye.y + right_y);
 
 #if GRAPHIC
 
@@ -280,7 +304,7 @@ void faceDetector::createLookupTable(cv::Mat& img, cv::Point2d centerOfTheShape,
 
 cv::Point faceDetector::recognizeShape(cv::Mat& imgorig,
 		faceDetector::lookUpTable& lookUpTable, string windowPrefix,
-		bool ellipse ) {
+		bool ellipse) {
 	float witdh_height_ratio = (float) imgorig.cols / (float) imgorig.rows;
 	float desired_height = 120;
 	float witdh_ratio = (float) imgorig.cols
@@ -348,15 +372,14 @@ cv::Point faceDetector::recognizeShape(cv::Mat& imgorig,
 					col_grad = 0;
 				}
 
-			}
-			else{
+			} else {
 				if (abs(row_grad) < 0.3) {
-									row_grad = 0;
+					row_grad = 0;
 
-								}
-				if (abs(col_grad) < 0.3 ) {
-									col_grad = 0;
-								}
+				}
+				if (abs(col_grad) < 0.3) {
+					col_grad = 0;
+				}
 
 			}
 

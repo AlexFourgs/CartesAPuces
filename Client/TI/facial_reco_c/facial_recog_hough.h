@@ -11,6 +11,7 @@
 #include <cmath>
 #include <map>
 #include <vector>
+#include <fstream>
 
 
 #endif /* FACIAL_RECOG_HOUGH_H_ */

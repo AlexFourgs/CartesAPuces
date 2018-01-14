@@ -31,7 +31,7 @@
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.build.location</key>
-					<value>${PROJECT_LOC}/bin/bin</value>
+					<value>/home/antoine/git/CartesAPuces/Client/TI/facial_reco_c/bin/bin</value>
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.build.target.auto</key>
@@ -51,7 +51,7 @@
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.buildLocation</key>
-					<value>${PROJECT_LOC}/bin/bin</value>
+					<value>/home/antoine/git/CartesAPuces/Client/TI/facial_reco_c/bin/bin</value>
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.cleanBuildTarget</key>
